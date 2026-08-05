@@ -1,10 +1,11 @@
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
+
 from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFacePipeline
 
 from transformers import pipeline
-from langchain_huggingface import HuggingFacePipeline
 
 
 def load_documents(pdf_paths):
@@ -28,23 +29,35 @@ def split_documents(documents):
 
 def create_embeddings():
     return HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
+        model_name="sentence-transformers/all-MiniLM-L6-v2",
+        model_kwargs={
+            "device": "cpu"
+        },
+        encode_kwargs={
+            "normalize_embeddings": True
+        }
     )
 
 
 def create_vector_store(chunks):
     embeddings = create_embeddings()
-    return FAISS.from_documents(chunks, embeddings)
+
+    return FAISS.from_documents(
+        chunks,
+        embeddings
+    )
 
 
 def load_llm():
     generator = pipeline(
-        "text2text-generation",
+        task="text2text-generation",
         model="google/flan-t5-base",
         max_new_tokens=256,
         device=-1
     )
 
-    return HuggingFacePipeline(
+    llm = HuggingFacePipeline(
         pipeline=generator
     )
+
+    return llm
