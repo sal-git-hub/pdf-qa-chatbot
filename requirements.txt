@@ -1,14 +1,13 @@
 streamlit
-
 langchain
 langchain-community
+langchain-core
 langchain-huggingface
 
-faiss-cpu
-
-sentence-transformers
 transformers
+sentence-transformers
+huggingface_hub
 torch
 
-huggingface_hub
+faiss-cpu
 pypdf
